@@ -1,0 +1,5 @@
+requests==2.10.0
+robotframework>=2.8.5
+robotframework-requests==0.4.5
+robotframework-selenium2library==1.7.4
+watchdog==0.8.0
