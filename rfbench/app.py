@@ -6,7 +6,7 @@ from tornado.httpserver import HTTPServer
 from tornado.wsgi import WSGIContainer
 import tornado.ioloop
 import argparse
-# import blueprints
+import blueprints
 import flask
 import importlib
 import inspect
