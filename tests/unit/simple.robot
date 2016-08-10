@@ -11,8 +11,9 @@
 
 | Simple Log to Console
 | | [Tags] | smoke
-| | Initialize suite variables
 | | LOG | Hello World!! | WARN
+| | LOG | ${KEYWORD DIR} | WARN
+| | LOG | ${DATA_DIR} | WARN
 
 *** Keywords ***
 
