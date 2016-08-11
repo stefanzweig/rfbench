@@ -24,11 +24,51 @@ class RobotBench(object):
             print(__version__)
             sys.exit(0)
 
+        self.app = flask.Flask(__name__)
+
+        self.app.add_url_rule("/", "home", self._root)
+        self.app.add_url_rule("/ping", "ping", self._ping)
+        self.app.add_url_rule("/favicon.ico", "favicon", self._favicon)
+        self.app.register_blueprint(blueprints.dashboard, url_prefix="/dashboard")
+
     def start(self):
-    	pass
+        """Start the app"""
+        if self.args.debug:
+            self.app.run(port=self.args.port, debug=self.args.debug, host=self.args.interface)
+        else:
+            root = "http://%s:%s" % (self.args.interface, self.args.port)
+            print("tornado web server running on " + root)
+            self.shutdown_requested = False
+            http_server = HTTPServer(WSGIContainer(self.app))
+            http_server.listen(port=self.args.port, address=self.args.interface)
+
+            signal.signal(signal.SIGINT, self.signal_handler)
+            tornado.ioloop.PeriodicCallback(self.check_shutdown_flag, 500).start()
+            tornado.ioloop.IOLoop.instance().start()
+
+    def signal_handler(self, *args):
+        """Handle SIGINT by setting a flag to request shutdown"""
+        self.shutdown_requested = True
+
+    def check_shutdown_flag(self):
+        """Shutdown the server if the flag has been set"""
+        if self.shutdown_requested:
+            tornado.ioloop.IOLoop.instance().stop()
+            print("web server stopped.")
+
+    def _favicon(self):
+        static_dir = os.path.join(self.app.root_path, 'static')
+        return flask.send_from_directory(os.path.join(self.app.root_path, 'static'),
+                                         'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+    def _root(self):
+        return flask.redirect(self.args.root)
+
+    def _ping(self):
+        """This function is called via the /ping url"""
+        return "pong"
 
     def _parse_args(self):
-    	print "parsing arguments!!"
         parser = argparse.ArgumentParser()
         parser.add_argument("-l", "--library", action="append", default=[],
                             help="load the given LIBRARY (eg: -l DatabaseLibrary)")
