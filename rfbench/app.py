@@ -1,5 +1,5 @@
 from flask import current_app
-from zweigdb import KeywordTable
+from zweigdb import SuiteTable
 from rfbench.version import __version__
 from robot.utils.argumentparser import ArgFileParser
 from tornado.httpserver import HTTPServer
@@ -25,10 +25,12 @@ class RobotBench(object):
             sys.exit(0)
 
         self.app = flask.Flask(__name__)
+        self.tsdb = SuiteTable(poll=self.args.poll)
 
         self.app.add_url_rule("/", "home", self._root)
         self.app.add_url_rule("/ping", "ping", self._ping)
         self.app.add_url_rule("/favicon.ico", "favicon", self._favicon)
+        self.app.register_blueprint(blueprints.api, url_prefix="/api")
         self.app.register_blueprint(blueprints.dashboard, url_prefix="/dashboard")
 
     def start(self):
