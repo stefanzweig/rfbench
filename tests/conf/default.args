@@ -3,7 +3,7 @@
 --variable BROWSER:chrome
 --variable KEYWORD_DIR:../../tests/keywords
 --variable HOST:localhost
---variable PORT:7071
+--variable PORT:7072
 
 --outputdir tests/results
 
